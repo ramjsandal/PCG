@@ -237,7 +237,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1556070338}
-  tile: {fileID: 2186735063515691477, guid: 3e27529f954dcce4dac19e76e400c8a4, type: 3}
+  tile: {fileID: 676542138462685072, guid: c7c36a3bfdb3c934c9a3e74b5a96ee82, type: 3}
+  leftRight: {fileID: 21300000, guid: d12fb619d371a1f45b122c40b0604c06, type: 3}
+  upLeftRight: {fileID: 21300000, guid: 497f530a9a1784e4c8cec816ca473bf4, type: 3}
+  downLeftRight: {fileID: 21300000, guid: d431203344843fc428a9219828e29bf2, type: 3}
 --- !u!4 &2038108126
 Transform:
   m_ObjectHideFlags: 0

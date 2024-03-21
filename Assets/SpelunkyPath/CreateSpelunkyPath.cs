@@ -23,13 +23,20 @@ public class CreateSpelunkyPath : MonoBehaviour
     [SerializeField] private Camera cam;
 
     [SerializeField] private GameObject tile;
+
+    [SerializeField] private Sprite leftRight;
+
+    [SerializeField] private Sprite upLeftRight;
+
+    [SerializeField] private Sprite downLeftRight;
     // Start is called before the first frame update
     void Start()
     {
-       GenerateRooms(10); 
+       GenerateRooms(25); 
        GenerateStartRow();
        DrawRooms();
-       cam.transform.position = new Vector3(_dimensions / 2.0f, _dimensions / 2.0f,-100);
+       cam.transform.position = new Vector3(_dimensions / 2.0f, (_dimensions % 2 == 0) ? (_dimensions / 2.0f) - .5f : (_dimensions / 2.0f) + .5f,-200);
+       cam.orthographicSize = _dimensions / 2.0f;
     }
 
     // Update is called once per frame
@@ -74,7 +81,7 @@ public class CreateSpelunkyPath : MonoBehaviour
 
        while (currentRoom > 0 && currentRoom < _dimensions - 1)
        {
-           if (Random.Range(1, 3) == 3)
+           if (Random.Range(1, _dimensions) == 3)
            {
                break;
            }
@@ -82,7 +89,7 @@ public class CreateSpelunkyPath : MonoBehaviour
            currentRoom += direction;
        }
 
-       _roomTypes[0, currentRoom] = 2;
+       _roomTypes[0, currentRoom] = 3;
 
        GenerateRow(1, currentRoom);
     }
@@ -94,7 +101,8 @@ public class CreateSpelunkyPath : MonoBehaviour
             return; 
         }
        //1. Set the starting tile to 3 so we can drop down into it
-       _roomTypes[startRow, startCol] = 3;
+       // LIES we acutally build up so we need 2 so we cna 'jump up'
+       _roomTypes[startRow, startCol] = 2;
 
        // 2. Pick left or right, -1 is left 1 is right
        int direction = Random.Range(1, 2) == 1 ? -1 : 1;
@@ -110,7 +118,7 @@ public class CreateSpelunkyPath : MonoBehaviour
        int currentRoom = column + direction;
        while (currentRoom > 0 && currentRoom < _dimensions - 1)
        {
-           if (Random.Range(1, 5) == 3)
+           if (Random.Range(1, _dimensions) == 3)
            {
                break;
            }
@@ -118,7 +126,7 @@ public class CreateSpelunkyPath : MonoBehaviour
            currentRoom += direction;
        }
 
-       _roomTypes[startRow, currentRoom] = 2;
+       _roomTypes[startRow, currentRoom] = 3;
 
        GenerateRow(startRow + 1, currentRoom);
     }
@@ -133,13 +141,20 @@ public class CreateSpelunkyPath : MonoBehaviour
             {
                _tiles[i, j] = Instantiate(tile);
                _tiles[i, j].transform.position = new Vector3(j, i, 0);
-               if (_roomTypes[i,j] == 0)
+               switch (_roomTypes[i,j]) 
                {
-                   _tiles[i, j].GetComponent<SpriteRenderer>().color = Color.black;
-               }
-               else
-               {
-                   _tiles[i, j].GetComponent<SpriteRenderer>().color = Color.white;
+                  case 0:
+                      _tiles[i, j].GetComponent<SpriteRenderer>().color = Color.black;
+                      break;
+                  case 1:
+                      _tiles[i, j].GetComponent<SpriteRenderer>().sprite = leftRight;
+                      break;
+                  case 2:
+                      _tiles[i, j].GetComponent<SpriteRenderer>().sprite = downLeftRight;
+                      break;
+                  case 3:
+                      _tiles[i, j].GetComponent<SpriteRenderer>().sprite = upLeftRight;
+                      break;
                }
             }
         }
