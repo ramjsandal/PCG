@@ -12,14 +12,14 @@ enum Bias
 }
 public class CellularAutomata : MonoBehaviour
 {
-    [SerializeField] private GameObject tile;
+    [SerializeField] private Cell tile;
     [SerializeField] private int dimensions;
     [SerializeField] private Camera cam;
     [SerializeField] private Bias bias;
     [SerializeField] private int inBiasPercent;
     [SerializeField] private int outBiasPercent;
     private float time;
-    private GameObject[,] _tiles;
+    private Cell [,] _tiles;
     private bool _finished;
 
     // Start is called before the first frame update
@@ -27,7 +27,7 @@ public class CellularAutomata : MonoBehaviour
     {
         time = 0;
         _finished = false;
-        _tiles = new GameObject[dimensions,dimensions];
+        _tiles = new Cell[dimensions,dimensions];
         cam.transform.position = new Vector3(dimensions / 2.0f, dimensions / 2.0f,-10);
         System.Random rand = new System.Random();
         int chanceInOneHundred;
@@ -36,24 +36,25 @@ public class CellularAutomata : MonoBehaviour
             for (int j = 0; j < dimensions; j++)
             {
                 _tiles[i, j] = Instantiate(tile);
-                _tiles[i, j].transform.position = new Vector3(i, j, 0);
+                _tiles[i, j].Init(_tiles[i,j].gameObject, _tiles[i,j].gameObject.GetComponent<SpriteRenderer>(), _tiles[i,j].gameObject.transform);
+                _tiles[i, j].SetPosition(i,j);
                 chanceInOneHundred = InBiasZone(bias, i, j) ? inBiasPercent : outBiasPercent;
                 if (rand.Next() % 100 > chanceInOneHundred)
                 {
-                    _tiles[i, j].GetComponent<SpriteRenderer>().color = Color.black;
+                    _tiles[i, j].SetTraversable(false);
                 }
                 else
                 {
-                    _tiles[i, j].GetComponent<SpriteRenderer>().color = Color.white;
+                    _tiles[i, j].SetTraversable(true);
                 }
             }
             
         }
     }
 
-    List<GameObject> GetNeighbors(GameObject currentTile)
+    List<Cell> GetNeighbors(Cell currentTile)
     {
-        List<GameObject> neighbors = new List<GameObject>();
+        List<Cell> neighbors = new List<Cell>();
         Vector3 pos = currentTile.transform.position;
         for (int i = -1; i < 2; i++)
         {
@@ -83,12 +84,12 @@ public class CellularAutomata : MonoBehaviour
         {
             for (int j = 0; j < dimensions; j++)
             {
-                GameObject currentCell = _tiles[i, j];
-                List<GameObject> neighbors = GetNeighbors(currentCell);
+                Cell currentCell = _tiles[i, j];
+                List<Cell> neighbors = GetNeighbors(currentCell);
                 int T = 0;
                 for (int k = 0; k < neighbors.Count; k++)
                 {
-                    if (neighbors[k].GetComponent<SpriteRenderer>().color == Color.black)
+                    if (!neighbors[k].Traversable())
                     {
                         T++;
                     }
@@ -96,10 +97,10 @@ public class CellularAutomata : MonoBehaviour
 
                 if (T >= 5.0f)
                 {
-                    currentCell.GetComponent<SpriteRenderer>().color = Color.black;
+                    currentCell.SetTraversable(false);
                 } else if (neighbors.Count - T >= 5)
                 {
-                    currentCell.GetComponent<SpriteRenderer>().color = Color.white;
+                    currentCell.SetTraversable(true);
                 }
                 
             }
@@ -112,15 +113,15 @@ public class CellularAutomata : MonoBehaviour
         {
             for (int j = 0; j < dimensions; j++)
             {
-                if (_tiles[i, j].GetComponent<SpriteRenderer>().color != Color.black)
+                if (_tiles[i, j].Traversable())
                 {
                     continue;
                 }
-                List<GameObject> neighbors = GetNeighbors(_tiles[i,j]);
-                if (neighbors.FindIndex(a => a.GetComponent<SpriteRenderer>().color == Color.white) != -1)
+                List<Cell> neighbors = GetNeighbors(_tiles[i,j]);
+                if (neighbors.FindIndex(a => a.Traversable()) != -1)
                 {
                     // this should be a wall
-                    _tiles[i,j].GetComponent<SpriteRenderer>().color = Color.gray;
+                    _tiles[i,j].SetTraversable(false, true);
                 }
             }
         }
@@ -179,13 +180,13 @@ public class CellularAutomata : MonoBehaviour
                     continue;
                 }
 
-                GameObject currentCell = _tiles[i, j];
-                List<GameObject> neighbors = GetNeighbors(currentCell);
+                Cell currentCell = _tiles[i, j];
+                List<Cell> neighbors = GetNeighbors(currentCell);
 
                 int emptyCells = 0;
-                foreach (GameObject neighbor in neighbors)
+                foreach (Cell neighbor in neighbors)
                 {
-                    if (neighbor.GetComponent<SpriteRenderer>().color == Color.white)
+                    if (neighbor.Traversable())
                     {
                         emptyCells++;
                     } 
@@ -193,11 +194,11 @@ public class CellularAutomata : MonoBehaviour
 
                 if (emptyCells >= 3)
                 {
-                    currentCell.GetComponent<SpriteRenderer>().color = Color.white;
+                    currentCell.SetTraversable(true);
                 }
                 else
                 {
-                     currentCell.GetComponent<SpriteRenderer>().color = Color.black;
+                     currentCell.SetTraversable(false);
                 }
             }
         }
