@@ -3,11 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+enum Bias
+{
+    None,
+    LeftRight,
+    UpLeftRight,
+    DownLeftRight
+}
 public class CellularAutomata : MonoBehaviour
 {
     [SerializeField] private GameObject tile;
     [SerializeField] private int dimensions;
     [SerializeField] private Camera cam;
+    [SerializeField] private Bias bias;
+    [SerializeField] private int inBiasPercent;
+    [SerializeField] private int outBiasPercent;
     private float time;
     private GameObject[,] _tiles;
     private bool _finished;
@@ -20,13 +30,15 @@ public class CellularAutomata : MonoBehaviour
         _tiles = new GameObject[dimensions,dimensions];
         cam.transform.position = new Vector3(dimensions / 2.0f, dimensions / 2.0f,-10);
         System.Random rand = new System.Random();
+        int chanceInOneHundred;
         for (int i = 0; i < dimensions; i++)
         {
             for (int j = 0; j < dimensions; j++)
             {
                 _tiles[i, j] = Instantiate(tile);
                 _tiles[i, j].transform.position = new Vector3(i, j, 0);
-                if (rand.Next() % 2 == 1)
+                chanceInOneHundred = InBiasZone(bias, i, j) ? inBiasPercent : outBiasPercent;
+                if (rand.Next() % 100 > chanceInOneHundred)
                 {
                     _tiles[i, j].GetComponent<SpriteRenderer>().color = Color.black;
                 }
@@ -126,6 +138,7 @@ public class CellularAutomata : MonoBehaviour
         {
             if (_finished == false)
             {
+                CleanEdges();
                 MakeWalls();
             }
             _finished = true;
@@ -135,5 +148,71 @@ public class CellularAutomata : MonoBehaviour
             time = 0;
             ApplyRule();
         }
+    } 
+    bool InBiasZone(Bias currentBias, int x, int y)
+    {
+        switch (currentBias)
+        {
+            case Bias.LeftRight:
+                // we dont care about the x value
+                return (y > dimensions / 4) && (y < dimensions * 3 / 4); 
+            case Bias.UpLeftRight:
+                return InBiasZone(Bias.LeftRight, x, y) 
+                           || (y > dimensions * 3 / 4) && (x > dimensions / 4) && (x < dimensions * 3 / 4);
+            case Bias.DownLeftRight:
+                return InBiasZone(Bias.LeftRight, x, y) 
+                           || (y < dimensions / 4) && (x > dimensions / 4) && (x < dimensions * 3 / 4);
+            default: // bias::none
+               return false;
+        }
+    
+    }
+
+    void CleanEdges()
+    {
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int j = 0; j < dimensions; j++)
+            {
+                if (!OnEdge(i, j))
+                {
+                    continue;
+                }
+
+                GameObject currentCell = _tiles[i, j];
+                List<GameObject> neighbors = GetNeighbors(currentCell);
+
+                int emptyCells = 0;
+                foreach (GameObject neighbor in neighbors)
+                {
+                    if (neighbor.GetComponent<SpriteRenderer>().color == Color.white)
+                    {
+                        emptyCells++;
+                    } 
+                }
+
+                if (emptyCells >= 3)
+                {
+                    currentCell.GetComponent<SpriteRenderer>().color = Color.white;
+                }
+                else
+                {
+                     currentCell.GetComponent<SpriteRenderer>().color = Color.black;
+                }
+            }
+        }
+        
+    }
+
+    bool OnEdge(int x, int y)
+    {
+        bool leftEdge = x == 0;
+        bool rightEdge = x == dimensions - 1;
+        bool topEdge = y == dimensions - 1;
+        bool bottomEdge = y == 0;
+
+        return topEdge || bottomEdge || leftEdge || rightEdge;
     }
 }
+
+
