@@ -10,7 +10,8 @@ public class GenerateLevel : MonoBehaviour
     void Start()
     {
         _nodeGenerator = new CellularAutomataInternal();
-        GenerateAndDrawCell(50, 4, Bias.LeftRight, 55, 45, 0, 0);
+        GenerateAndDrawCell(100, 4, Bias.LeftRight, 55, 45, 0, 0);
+        GenerateAndDrawCell(100, 4, Bias.DownLeftRight, 55, 45, 100, 0);
     }
 
     // Update is called once per frame
@@ -41,7 +42,7 @@ public class GenerateLevel : MonoBehaviour
                 var spr = current.GetComponent<SpriteRenderer>();
 
                 current.transform.position = new Vector3(i, j, 0);
-                spr.color = map[i, j].traversable ? Color.white : Color.black;
+                spr.color = map[i - xStart, j - yStart].traversable ? Color.white : Color.black;
             }
         }
     }
