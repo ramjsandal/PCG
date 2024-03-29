@@ -10,7 +10,7 @@ public class GenerateLevel : MonoBehaviour
     void Start()
     {
         _nodeGenerator = new CellularAutomataInternal();
-        GenerateAndDrawCell(25, 10, Bias.LeftRight, 55, 45, 0, 0);
+        GenerateAndDrawCell(50, 4, Bias.LeftRight, 55, 45, 0, 0);
     }
 
     // Update is called once per frame

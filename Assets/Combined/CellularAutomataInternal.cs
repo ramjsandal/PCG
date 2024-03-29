@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.SceneTemplate;
 using UnityEngine;
 
@@ -12,10 +13,11 @@ public class CellularAutomataInternal
         public int yIdx;
         public bool traversable;
 
-        public void SetIndex(int x, int y)
+        public CellState(int x, int y, bool trav)
         {
             xIdx = x;
             yIdx = y;
+            traversable = trav;
         }
     }
       
@@ -29,18 +31,18 @@ public class CellularAutomataInternal
             for (int j = 0; j < dim; j++)
             {
                 int prob = InBiasZone(dim, b, i, j) ? inB : outB;
-                area[i, j].traversable = (rand.Next() % 100) > prob; 
-                area[i,j].SetIndex(i, j);
+                bool trav = !((rand.Next() % 100) > prob);
+                area[i, j] = new CellState(i, j, trav);
             }
         }
 
         for (int i = 0; i < generations; i++)
         {
-            ApplyRule(area, dim);
+            area = ApplyRule(area, dim);
         }
         
-        CleanEdges(area, dim);
-
+        area = CleanEdges(area, dim);
+        
         return area;
     }
     
@@ -73,8 +75,9 @@ public class CellularAutomataInternal
     }
  
     
-    void ApplyRule(CellState[,] map, int dimensions)
+    CellState[,] ApplyRule(CellState[,] map, int dimensions)
     {
+        CellState[,] nextGen = new CellState[dimensions, dimensions];
         for (int i = 0; i < dimensions; i++)
         {
             for (int j = 0; j < dimensions; j++)
@@ -97,9 +100,12 @@ public class CellularAutomataInternal
                 {
                     currentCell.traversable = true;
                 }
-                
+
+                nextGen[i, j] = currentCell;
             }
         }
+
+        return nextGen;
     }
     
     bool InBiasZone(int dimensions, Bias currentBias, int x, int y)
@@ -121,14 +127,16 @@ public class CellularAutomataInternal
     }
         
         
-    void CleanEdges(CellState[,] map, int dimensions)
+    CellState[,] CleanEdges(CellState[,] map, int dimensions)
     {
+        CellState[,] ret = new CellState[dimensions, dimensions];
         for (int i = 0; i < dimensions; i++)
         {
             for (int j = 0; j < dimensions; j++)
             {
                 if (!OnEdge(dimensions, i, j))
                 {
+                    ret[i, j] = map[i,j];
                     continue;
                 }
 
@@ -152,9 +160,12 @@ public class CellularAutomataInternal
                 {
                      currentCell.traversable = false;
                 }
+
+                ret[i, j] = currentCell;
             }
         }
-        
+
+        return ret;
     }
     
     bool OnEdge(int dimensions, int x, int y)
