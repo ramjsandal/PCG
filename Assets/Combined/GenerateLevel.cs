@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
@@ -10,8 +11,12 @@ public class GenerateLevel : MonoBehaviour
     void Start()
     {
         _nodeGenerator = new CellularAutomataInternal();
+        _path = new CreateSpelunkyPath();
+        /*
         GenerateAndDrawCell(100, 4, Bias.LeftRight, 55, 45, 0, 0);
         GenerateAndDrawCell(100, 4, Bias.DownLeftRight, 55, 45, 100, 0);
+        */
+        CreateMap(4, 100);
     }
 
     // Update is called once per frame
@@ -27,9 +32,38 @@ public class GenerateLevel : MonoBehaviour
  
     }
 
-    private int[,] GenerateLayout()
+    private int[,] GenerateLayout(int dimensions)
     {
-        return _path.GenerateLayout(10);
+        return _path.GenerateLayout(dimensions);
+    }
+
+    void CreateMap(int mapDimensions, int nodeDimensions, int generations = 5, int inBiasPercent = 56, int outBiasPercent = 44)
+    {
+        int[,] layout = GenerateLayout(mapDimensions);
+        for (int i = 0; i < mapDimensions; i++)
+        {
+            for (int j = 0; j < mapDimensions; j++)
+            {
+                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, i * nodeDimensions, j*nodeDimensions);
+            }
+        }
+    }
+
+    Bias numberToBias(int num)
+    {
+        switch (num)
+        {
+            case 0:
+                return Bias.None;
+            case 1:
+                return Bias.LeftRight;
+            case 2:
+                return Bias.DownLeftRight;
+            case 3:
+                return Bias.UpLeftRight;
+            default:
+                throw new InvalidEnumArgumentException();
+        }
     }
     
     public void DrawCell(CellularAutomataInternal.CellState[,] map, int dimensions, int xStart, int yStart)

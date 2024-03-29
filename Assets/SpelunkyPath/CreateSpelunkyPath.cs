@@ -20,6 +20,7 @@ public class CreateSpelunkyPath : MonoBehaviour
     private int[,] _roomTypes;
     private GameObject[,] _tiles;
     private int _dimensions;
+    private SpelunkyPathInternal _path;
     [SerializeField] private Camera cam;
 
     [SerializeField] private GameObject tile;
