@@ -65,7 +65,6 @@ public class CellularAutomataInternal
                 {
                     continue;
                 }
-
                 neighbors.Add(map[(int)currentTile.xIdx + i, (int)currentTile.yIdx + j]);
             }
         }
