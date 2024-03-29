@@ -32,11 +32,13 @@ public class CreateSpelunkyPath : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        /*
        GenerateRooms(25); 
        GenerateStartRow();
        DrawRooms();
        cam.transform.position = new Vector3(_dimensions / 2.0f, (_dimensions % 2 == 0) ? (_dimensions / 2.0f) - .5f : (_dimensions / 2.0f) + .5f,-200);
        cam.orthographicSize = _dimensions / 2.0f;
+       */
     }
 
     // Update is called once per frame
@@ -159,4 +161,11 @@ public class CreateSpelunkyPath : MonoBehaviour
             }
         }
     }
+
+    public int[,] GenerateLayout(int dimensions)
+    {
+        GenerateRooms(dimensions);
+        GenerateStartRow();
+        return _roomTypes;
+    } 
 }

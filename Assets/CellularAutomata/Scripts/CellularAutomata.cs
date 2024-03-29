@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-enum Bias
+public enum Bias
 {
     None,
     LeftRight,
@@ -21,6 +21,8 @@ public class CellularAutomata : MonoBehaviour
     private float time;
     private Cell [,] _tiles;
     private bool _finished;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -52,7 +54,7 @@ public class CellularAutomata : MonoBehaviour
         }
     }
 
-    List<Cell> GetNeighbors(Cell currentTile)
+   List<Cell> GetNeighbors(Cell currentTile)
     {
         List<Cell> neighbors = new List<Cell>();
         Vector3 pos = currentTile.transform.position;
@@ -76,7 +78,6 @@ public class CellularAutomata : MonoBehaviour
         return neighbors;
 
     }
-    
 
     void ApplyRule()
     {
@@ -149,7 +150,8 @@ public class CellularAutomata : MonoBehaviour
             time = 0;
             ApplyRule();
         }
-    } 
+    }
+
     bool InBiasZone(Bias currentBias, int x, int y)
     {
         switch (currentBias)
@@ -166,10 +168,9 @@ public class CellularAutomata : MonoBehaviour
             default: // bias::none
                return false;
         }
-    
     }
-
-    void CleanEdges()
+    
+        void CleanEdges()
     {
         for (int i = 0; i < dimensions; i++)
         {
