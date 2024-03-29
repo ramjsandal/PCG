@@ -6,12 +6,12 @@ using UnityEngine;
 public class GenerateLevel : MonoBehaviour
 {
     [SerializeField] private GameObject tile;
-    private CreateSpelunkyPath _path;
+    private SpelunkyPathInternal _path;
     private CellularAutomataInternal _nodeGenerator;
     void Start()
     {
         _nodeGenerator = new CellularAutomataInternal();
-        _path = new CreateSpelunkyPath();
+        _path = new SpelunkyPathInternal();
         /*
         GenerateAndDrawCell(100, 4, Bias.LeftRight, 55, 45, 0, 0);
         GenerateAndDrawCell(100, 4, Bias.DownLeftRight, 55, 45, 100, 0);
@@ -68,15 +68,15 @@ public class GenerateLevel : MonoBehaviour
     
     public void DrawCell(CellularAutomataInternal.CellState[,] map, int dimensions, int xStart, int yStart)
     {
-        for (int i = 0 + xStart; i < dimensions + xStart; i++)
+        for (int i = 0 + yStart; i < dimensions + yStart; i++)
         {
-            for (int j = 0 + yStart; j < dimensions + yStart; j++)
+            for (int j = 0 + xStart; j < dimensions + xStart; j++)
             {
                 GameObject current = Instantiate(tile);
                 var spr = current.GetComponent<SpriteRenderer>();
 
-                current.transform.position = new Vector3(i, j, 0);
-                spr.color = map[i - xStart, j - yStart].traversable ? Color.white : Color.black;
+                current.transform.position = new Vector3(j, i, 0);
+                spr.color = map[i - yStart, j - xStart].traversable ? Color.white : Color.black;
             }
         }
     }
