@@ -38,15 +38,15 @@ public class CellularAutomataInternal
 
         for (int i = 0; i < generations; i++)
         {
-            area = ApplyRule(area, dim);
+            ApplyRule(ref area, dim);
         }
         
-        area = CleanEdges(area, dim);
+        CleanEdges(ref area, dim);
         
         return area;
     }
     
-    List<CellState> GetNeighbors(CellState[,] map, CellState currentTile, int dimensions)
+    List<CellState> GetNeighbors(ref CellState[,] map, CellState currentTile, int dimensions)
     {
         List<CellState> neighbors = new List<CellState>();
         for (int i = -1; i < 2; i++)
@@ -66,7 +66,6 @@ public class CellularAutomataInternal
                     continue;
                 }
 
-                Debug.Log("X: " + currentTile.xIdx + " xOff: "+ i + " Y: " + currentTile.yIdx + " yOff: " + j + " dim: " + dimensions);
                 neighbors.Add(map[(int)currentTile.xIdx + i, (int)currentTile.yIdx + j]);
             }
         }
@@ -75,15 +74,13 @@ public class CellularAutomataInternal
     }
  
     
-    CellState[,] ApplyRule(CellState[,] map, int dimensions)
+    void ApplyRule(ref CellState[,] map, int dimensions)
     {
-        CellState[,] nextGen = new CellState[dimensions, dimensions];
         for (int i = 0; i < dimensions; i++)
         {
             for (int j = 0; j < dimensions; j++)
             {
-                CellState currentCell = map[i, j];
-                List<CellState> neighbors = GetNeighbors(map, currentCell, dimensions);
+                List<CellState> neighbors = GetNeighbors(ref map, map[i,j], dimensions);
                 int T = 0;
                 for (int k = 0; k < neighbors.Count; k++)
                 {
@@ -95,17 +92,14 @@ public class CellularAutomataInternal
 
                 if (T >= 5.0f)
                 {
-                    currentCell.traversable = false;
+                    map[i,j].traversable = false;
                 } else if (neighbors.Count - T >= 5)
                 {
-                    currentCell.traversable = true;
+                    map[i,j].traversable = true;
                 }
 
-                nextGen[i, j] = currentCell;
             }
         }
-
-        return nextGen;
     }
     
     bool InBiasZone(int dimensions, Bias currentBias, int x, int y)
@@ -127,21 +121,18 @@ public class CellularAutomataInternal
     }
         
         
-    CellState[,] CleanEdges(CellState[,] map, int dimensions)
+    void CleanEdges(ref CellState[,] map, int dimensions)
     {
-        CellState[,] ret = new CellState[dimensions, dimensions];
         for (int i = 0; i < dimensions; i++)
         {
             for (int j = 0; j < dimensions; j++)
             {
                 if (!OnEdge(dimensions, i, j))
                 {
-                    ret[i, j] = map[i,j];
                     continue;
                 }
 
-                CellState currentCell = map[i, j];
-                List<CellState> neighbors = GetNeighbors(map, currentCell, dimensions);
+                List<CellState> neighbors = GetNeighbors(ref map, map[i,j], dimensions);
 
                 int emptyCells = 0;
                 foreach (CellState neighbor in neighbors)
@@ -154,18 +145,15 @@ public class CellularAutomataInternal
 
                 if (emptyCells >= 3)
                 {
-                    currentCell.traversable = true;
+                    map[i,j].traversable = true;
                 }
                 else
-                {
-                     currentCell.traversable = false;
+                { 
+                    map[i,j].traversable = false;
                 }
 
-                ret[i, j] = currentCell;
             }
         }
-
-        return ret;
     }
     
     bool OnEdge(int dimensions, int x, int y)
