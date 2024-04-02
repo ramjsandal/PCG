@@ -40,11 +40,12 @@ public class GenerateLevel : MonoBehaviour
     void CreateMap(int mapDimensions, int nodeDimensions, int generations = 5, int inBiasPercent = 56, int outBiasPercent = 44)
     {
         int[,] layout = GenerateLayout(mapDimensions);
+        _path.DrawTextLayout(layout, mapDimensions);
         for (int i = 0; i < mapDimensions; i++)
         {
             for (int j = 0; j < mapDimensions; j++)
             {
-                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, i * nodeDimensions, j*nodeDimensions);
+                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, j * nodeDimensions, (mapDimensions * nodeDimensions) - i * nodeDimensions);
             }
         }
     }
@@ -68,15 +69,15 @@ public class GenerateLevel : MonoBehaviour
     
     public void DrawCell(CellularAutomataInternal.CellState[,] map, int dimensions, int xStart, int yStart)
     {
-        for (int i = 0 + yStart; i < dimensions + yStart; i++)
+        for (int i = 0; i < dimensions; i++)
         {
-            for (int j = 0 + xStart; j < dimensions + xStart; j++)
+            for (int j = 0; j < dimensions; j++)
             {
                 GameObject current = Instantiate(tile);
                 var spr = current.GetComponent<SpriteRenderer>();
 
-                current.transform.position = new Vector3(j, i, 0);
-                spr.color = map[i - yStart, j - xStart].traversable ? Color.white : Color.black;
+                current.transform.position = new Vector3(i + xStart,  yStart + dimensions - j, 0);
+                spr.color = map[i, j].traversable ? Color.white : Color.black;
             }
         }
     }

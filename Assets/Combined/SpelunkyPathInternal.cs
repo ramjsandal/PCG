@@ -101,4 +101,21 @@ public class SpelunkyPathInternal
         return rooms;
     }
 
+    public void DrawTextLayout(int[,] layout, int dimensions)
+    {
+        string total = "";
+        for (int i = 0; i < dimensions; i++)
+        {
+            string currentLine = "";
+            for (int j = 0; j < dimensions; j++)
+            {
+                currentLine += layout[i, j] + ", ";
+            }
+
+            currentLine += "\n";
+            total += currentLine;
+        }
+        Debug.Log(total);
+    }
+
 }
