@@ -31,7 +31,7 @@ public class CellularAutomataInternal
         None
     };
 
-    CellState[,] GenerateInitial(int dim, Bias b, int inB, int outB, bool[] initSide = null, Side side = Side.None)
+    public CellState[,] GenerateInitial(int dim, Bias b, int inB, int outB, bool[] initSide = null, Side side = Side.None)
     {
         CellState[,] area = new CellState[dim, dim];
         System.Random rand = new System.Random();
@@ -93,7 +93,7 @@ public class CellularAutomataInternal
     }
  
     
-    void ApplyRule(ref CellState[,] map, int dimensions)
+    public void ApplyRule(ref CellState[,] map, int dimensions)
     {
         for (int i = 0; i < dimensions; i++)
         {
@@ -140,7 +140,7 @@ public class CellularAutomataInternal
     }
         
         
-    void CleanEdges(ref CellState[,] map, int dimensions)
+    public void CleanEdges(ref CellState[,] map, int dimensions)
     {
         for (int i = 0; i < dimensions; i++)
         {
