@@ -45,7 +45,7 @@ public class GenerateLevel : MonoBehaviour
         {
             for (int j = 0; j < mapDimensions; j++)
             {
-                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, j * nodeDimensions, ((mapDimensions - i) * nodeDimensions));
+                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, j * nodeDimensions, ((mapDimensions - 1 - i) * nodeDimensions));
             }
         }
     }

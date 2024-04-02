@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Unity.VisualScripting;
 using UnityEditor.SceneTemplate;
 using UnityEngine;
@@ -20,10 +21,18 @@ public class CellularAutomataInternal
             traversable = trav;
         }
     }
-      
-    public CellState[,] GenerateArea(int dim, int generations, Bias b, int inB, int outB)
+
+    public enum Side
     {
-        // true is traversible, false is untraversible
+        Up,
+        Right,
+        Down,
+        Left,
+        None
+    };
+
+    CellState[,] GenerateInitial(int dim, Bias b, int inB, int outB, bool[] initSide = null, Side side = Side.None)
+    {
         CellState[,] area = new CellState[dim, dim];
         System.Random rand = new System.Random();
         for (int i = 0; i < dim; i++)
@@ -36,6 +45,17 @@ public class CellularAutomataInternal
             }
         }
 
+        if (initSide != null && side != Side.None)
+        {
+           SetRow(ref area, side, dim, initSide); 
+        }
+
+        return area;
+    }
+    public CellState[,] GenerateArea(int dim, int generations, Bias b, int inB, int outB)
+    {
+        // true is traversible, false is untraversible
+        CellState[,] area = GenerateInitial(dim, b, inB, outB);
         for (int i = 0; i < generations; i++)
         {
             ApplyRule(ref area, dim);
@@ -163,6 +183,93 @@ public class CellularAutomataInternal
         bool bottomEdge = y == 0;
 
         return topEdge || bottomEdge || leftEdge || rightEdge;
+    }
+
+    bool OnEdge(int dimensions, int x, int y, Side side)
+    {
+        switch (side)
+        {
+            case Side.Up:
+                return y == dimensions - 1;
+            case Side.Down:
+                return y == 0;
+            case Side.Left:
+                return x == 0;
+            case Side.Right:
+                return x == dimensions - 1;
+            default:
+                throw new InvalidEnumArgumentException();
+        }
+    }
+
+    // stores left -> right and
+    // up -> down
+    bool[] GetRow(ref CellState[,] map, Side side, int dimensions)
+    {
+        bool[] row = new bool[dimensions];
+        int count = 0;
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int j = 0; j < dimensions; j++)
+            {
+                if (OnEdge(dimensions, i, j, side))
+                {
+                    row[count] = map[i, j].traversable;
+                    count++;
+                }
+            }
+        }
+
+        return row;
+
+    }
+
+    void SetRow(ref CellState[,] map, Side side, int dimensions, bool[] row)
+    {
+        int xStart = 0;
+        int yStart = 0;
+        // if true, we increment x, if false, we increment y
+        bool xIncrement = true;
+        switch (side)
+        {
+           case Side.Up:
+               xStart = 0;
+               yStart = dimensions - 1;
+               xIncrement = true;
+               break;
+            case Side.Down:
+               xStart = 0;
+               yStart = 0;
+               xIncrement = true;
+               break;
+            case Side.Left:
+               xStart = 0;
+               yStart = 0;
+               xIncrement = false;
+               break;
+            case Side.Right:
+                xStart = dimensions - 1;
+               yStart = 0;
+               xIncrement = false;
+               break;
+            default:
+                throw new InvalidEnumArgumentException();
+        }
+
+        int count = 0;
+        while (xStart < dimensions && yStart < dimensions && count < dimensions)
+        {
+            map[xStart, yStart].traversable = row[count];
+            count++;
+            if (xIncrement)
+            {
+                xStart++;
+            }
+            else
+            {
+                yStart++;
+            }
+        }
     }
 
 }
