@@ -52,15 +52,15 @@ public class CellularAutomataInternal
 
         return area;
     }
-    public CellState[,] GenerateArea(int dim, int generations, Bias b, int inB, int outB)
+    public CellState[,] GenerateArea(int dim, int generations, Bias b, int inB, int outB, bool[] initSide = null, Side side = Side.None)
     {
         // true is traversible, false is untraversible
-        CellState[,] area = GenerateInitial(dim, b, inB, outB);
+        CellState[,] area = GenerateInitial(dim, b, inB, outB, initSide, side);
         for (int i = 0; i < generations; i++)
         {
             ApplyRule(ref area, dim);
         }
-        
+
         CleanEdges(ref area, dim);
         
         return area;

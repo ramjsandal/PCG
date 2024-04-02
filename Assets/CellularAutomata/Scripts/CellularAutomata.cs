@@ -19,6 +19,8 @@ public class CellularAutomata : MonoBehaviour
     [SerializeField] private Bias bias;
     [SerializeField] private int inBiasPercent;
     [SerializeField] private int outBiasPercent;
+    [SerializeField] private int rowPercent;
+    [SerializeField] private CellularAutomataInternal.Side side;
     private float time;
     private bool _finished;
     private CellularAutomataInternal _cellularAutomataInternal;
@@ -46,7 +48,7 @@ public class CellularAutomata : MonoBehaviour
         time = 0;
         _finished = false;
         cam.transform.position = new Vector3(dimensions / 2.0f, dimensions / 2.0f, -10);
-        _cellStates = _cellularAutomataInternal.GenerateInitial(dimensions, bias, inBiasPercent, outBiasPercent);
+        _cellStates = _cellularAutomataInternal.GenerateInitial(dimensions, bias, inBiasPercent, outBiasPercent, CreateRow(rowPercent), side);
         DrawCells();
 
     }
@@ -87,5 +89,16 @@ public class CellularAutomata : MonoBehaviour
                 _spriteRenderers[i, j].color = _cellStates[i, j].traversable ? Color.white : Color.black;
             }
         }
+    }
+
+    private bool[] CreateRow(int middlePercent = 66)
+    {
+        bool[] ret = new bool[dimensions];
+        for (int i = 0; i < dimensions; i++)
+        {
+            ret[i] = (i >= dimensions - middlePercent && i <= middlePercent);
+        }
+
+        return ret;
     }
 }
