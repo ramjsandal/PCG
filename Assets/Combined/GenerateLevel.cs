@@ -45,7 +45,7 @@ public class GenerateLevel : MonoBehaviour
         {
             for (int j = 0; j < mapDimensions; j++)
             {
-                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, j * nodeDimensions, (mapDimensions * nodeDimensions) - i * nodeDimensions);
+                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, j * nodeDimensions, ((mapDimensions - i) * nodeDimensions));
             }
         }
     }
@@ -76,7 +76,7 @@ public class GenerateLevel : MonoBehaviour
                 GameObject current = Instantiate(tile);
                 var spr = current.GetComponent<SpriteRenderer>();
 
-                current.transform.position = new Vector3(i + xStart,  yStart + dimensions - j, 0);
+                current.transform.position = new Vector3(i + xStart,  yStart + j, 0);
                 spr.color = map[i, j].traversable ? Color.white : Color.black;
             }
         }

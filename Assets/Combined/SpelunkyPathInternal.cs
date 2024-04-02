@@ -98,6 +98,7 @@ public class SpelunkyPathInternal
     {
         int[,] rooms = GenerateRooms(dimensions);
         GenerateStartRow(ref rooms, dimensions);
+        rooms = Flip(rooms, dimensions);
         return rooms;
     }
 
@@ -116,6 +117,21 @@ public class SpelunkyPathInternal
             total += currentLine;
         }
         Debug.Log(total);
+    }
+
+    // flip 
+    int[,] Flip(int[,] layout, int dimensions)
+    {
+        int[,] ret = new int[dimensions, dimensions];
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int j = 0; j < dimensions; j++)
+            {
+                ret[i, j] = layout[dimensions - 1 - i, j];
+            }
+        }
+
+        return ret;
     }
 
 }
