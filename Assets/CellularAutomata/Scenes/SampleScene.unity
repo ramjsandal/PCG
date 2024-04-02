@@ -242,7 +242,7 @@ MonoBehaviour:
   bias: 1
   inBiasPercent: 55
   outBiasPercent: 45
-  rowPercent: 66
+  rowPercent: 0.66
   side: 0
 --- !u!4 &1434650025
 Transform:
