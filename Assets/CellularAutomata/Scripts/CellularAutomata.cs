@@ -19,7 +19,7 @@ public class CellularAutomata : MonoBehaviour
     [SerializeField] private Bias bias;
     [SerializeField] private int inBiasPercent;
     [SerializeField] private int outBiasPercent;
-    [SerializeField] private int rowPercent;
+    [SerializeField] private float rowPercent;
     [SerializeField] private CellularAutomataInternal.Side side;
     private float time;
     private bool _finished;
@@ -91,12 +91,12 @@ public class CellularAutomata : MonoBehaviour
         }
     }
 
-    private bool[] CreateRow(int middlePercent = 66)
+    private bool[] CreateRow(float middlePercent = 0.66f)
     {
         bool[] ret = new bool[dimensions];
         for (int i = 0; i < dimensions; i++)
         {
-            ret[i] = (i >= dimensions - middlePercent && i <= middlePercent);
+            ret[i] = (i >= dimensions - (middlePercent * dimensions) && i <= (middlePercent * dimensions));
         }
 
         return ret;
