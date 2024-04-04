@@ -62,6 +62,8 @@ public class CellularAutomataInternal
             for (int j = 0; j < dim; j++)
             {
                 int prob = InBiasZone(dim, b, i, j) ? inB : outB;
+                // if we have no bias, we want to just do 50/50
+                prob = b == Bias.None ? 50 : prob;
                 bool trav = !((rand.Next() % 100) > prob);
                 area[i, j] = new CellState(i, j, trav);
             }
