@@ -82,7 +82,7 @@ public class GenerateLevel : MonoBehaviour
 
           return sides;
     }
-    void CreateMap(int mapDimensions, int nodeDimensions, int generations = 5, int inBiasPercent = 56, int outBiasPercent = 44)
+    void CreateMap(int mapDimensions, int nodeDimensions, int generations = 3, int inBiasPercent = 56, int outBiasPercent = 44, int finalRule = 3)
     {
         // Initialize grid to empty
         CellularAutomataInternal.CellState[,][,] cells = new CellularAutomataInternal.CellState[nodeDimensions,nodeDimensions][,];
@@ -106,7 +106,10 @@ public class GenerateLevel : MonoBehaviour
         CellularAutomataInternal.CellState[,] bigGrid = CoalesceCellState(cells, mapDimensions, nodeDimensions);
         
         // Apply the rule on the whole grid to smooth it out
-        _nodeGenerator.ApplyRule(ref bigGrid, mapDimensions * nodeDimensions);
+        for (int i = 0; i < finalRule; i++)
+        {
+            _nodeGenerator.ApplyRule(ref bigGrid, mapDimensions * nodeDimensions);
+        }
         
         // Draw the big grid
         DrawBigGrid(bigGrid, mapDimensions * nodeDimensions);
