@@ -32,6 +32,11 @@ public class GenerateLevel : MonoBehaviour
  
     }
 
+    CellularAutomataInternal.CellState[,] GenerateCell(int dimensions, int generations, Bias b, int inBiasPercent, int outBiasPercent, (bool[], CellularAutomataInternal.Side)[] sides)
+    {
+        return _nodeGenerator.GenerateArea(dimensions, generations, b, inBiasPercent, outBiasPercent, sides);
+    }
+
     private int[,] GenerateLayout(int dimensions)
     {
         return _path.GenerateLayout(dimensions);
@@ -39,13 +44,60 @@ public class GenerateLevel : MonoBehaviour
 
     void CreateMap(int mapDimensions, int nodeDimensions, int generations = 5, int inBiasPercent = 56, int outBiasPercent = 44)
     {
+        CellularAutomataInternal.CellState[,][,] cells = new CellularAutomataInternal.CellState[nodeDimensions,nodeDimensions][,];
         int[,] layout = GenerateLayout(mapDimensions);
         _path.DrawTextLayout(layout, mapDimensions);
         for (int i = 0; i < mapDimensions; i++)
         {
             for (int j = 0; j < mapDimensions; j++)
             {
-                GenerateAndDrawCell(nodeDimensions, generations, numberToBias(layout[i,j]), inBiasPercent, outBiasPercent, j * nodeDimensions, ((mapDimensions - 1 - i) * nodeDimensions));
+                (bool[], CellularAutomataInternal.Side)[] sides = new (bool[], CellularAutomataInternal.Side)[4];
+                int x = j;
+                int y = (mapDimensions - 1 - i);
+                int count = 0;
+                // check above
+                if (y + 1 < mapDimensions && cells[x, y + 1] != null)
+                {
+                    sides[count] = (
+                        _nodeGenerator.GetRow(ref cells[x, y + 1], CellularAutomataInternal.Side.Down, nodeDimensions),
+                        CellularAutomataInternal.Side.Up);
+                    count++;
+                }
+                // check below 
+                if (y - 1 >= 0 && cells[x, y - 1] != null)
+                {
+                    sides[count] = (
+                        _nodeGenerator.GetRow(ref cells[x, y - 1], CellularAutomataInternal.Side.Up, nodeDimensions),
+                        CellularAutomataInternal.Side.Down);
+                    count++;
+                }
+                // check left 
+                if (x - 1 >= 0 && cells[x - 1, y] != null)
+                {
+                    sides[count] = (
+                        _nodeGenerator.GetRow(ref cells[x - 1, y], CellularAutomataInternal.Side.Right, nodeDimensions),
+                        CellularAutomataInternal.Side.Left);
+                    count++;
+                }
+                // check right 
+                if (x + 1 >= 0 && cells[x + 1, y] != null)
+                {
+                    sides[count] = (
+                        _nodeGenerator.GetRow(ref cells[x + 1, y], CellularAutomataInternal.Side.Left, nodeDimensions),
+                        CellularAutomataInternal.Side.Right);
+                    count++;
+                }
+                
+                cells[i, j] = GenerateCell(nodeDimensions, generations, numberToBias(layout[i, j]), inBiasPercent,
+                    outBiasPercent, sides);
+            }
+        }
+        
+        for (int i = 0; i < mapDimensions; i++)
+        {
+            for (int j = 0; j < mapDimensions; j++)
+            {
+                DrawCell(cells[i,j], nodeDimensions, j * nodeDimensions, ((mapDimensions - 1 - i) * nodeDimensions));
             }
         }
     }

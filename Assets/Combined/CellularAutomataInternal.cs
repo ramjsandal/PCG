@@ -52,6 +52,48 @@ public class CellularAutomataInternal
 
         return area;
     }
+
+    public CellState[,] GenerateInitial(int dim, Bias b, int inB, int outB, (bool[], Side)[] sides)
+    {
+         CellState[,] area = new CellState[dim, dim];
+        System.Random rand = new System.Random();
+        for (int i = 0; i < dim; i++)
+        {
+            for (int j = 0; j < dim; j++)
+            {
+                int prob = InBiasZone(dim, b, i, j) ? inB : outB;
+                bool trav = !((rand.Next() % 100) > prob);
+                area[i, j] = new CellState(i, j, trav);
+            }
+        }
+
+        for (int i = 0; i < sides.Length; i++)
+        {
+            if (sides[i].Item1 == null)
+            {
+                break;
+                
+            }
+            SetRow(ref area, sides[i].Item2, dim, sides[i].Item1);
+        }
+        
+
+        return area;   
+    }
+    
+    public CellState[,] GenerateArea(int dim, int generations, Bias b, int inB, int outB, (bool[], Side)[] sides)
+    {
+        // true is traversible, false is untraversible
+        CellState[,] area = GenerateInitial(dim, b, inB, outB, sides);
+        for (int i = 0; i < generations; i++)
+        {
+            ApplyRule(ref area, dim);
+        }
+
+        CleanEdges(ref area, dim);
+        
+        return area;
+    }
     public CellState[,] GenerateArea(int dim, int generations, Bias b, int inB, int outB, bool[] initSide = null, Side side = Side.None)
     {
         // true is traversible, false is untraversible
@@ -204,7 +246,7 @@ public class CellularAutomataInternal
 
     // stores left -> right and
     // up -> down
-    bool[] GetRow(ref CellState[,] map, Side side, int dimensions)
+    public bool[] GetRow(ref CellState[,] map, Side side, int dimensions)
     {
         bool[] row = new bool[dimensions];
         int count = 0;
@@ -224,7 +266,7 @@ public class CellularAutomataInternal
 
     }
 
-    void SetRow(ref CellState[,] map, Side side, int dimensions, bool[] row)
+    public void SetRow(ref CellState[,] map, Side side, int dimensions, bool[] row)
     {
         int xStart = 0;
         int yStart = 0;
