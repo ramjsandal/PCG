@@ -84,9 +84,13 @@ public class GenerateLevel : MonoBehaviour
     }
     void CreateMap(int mapDimensions, int nodeDimensions, int generations = 5, int inBiasPercent = 56, int outBiasPercent = 44)
     {
+        // Initialize grid to empty
         CellularAutomataInternal.CellState[,][,] cells = new CellularAutomataInternal.CellState[nodeDimensions,nodeDimensions][,];
+        
+        // Generate layout using path component 
         int[,] layout = GenerateLayout(mapDimensions);
-        _path.DrawTextLayout(layout, mapDimensions);
+        
+        // loop through map dimensions, generating cells
         for (int i = 0; i < mapDimensions; i++)
         {
             for (int j = 0; j < mapDimensions; j++)
@@ -97,17 +101,14 @@ public class GenerateLevel : MonoBehaviour
                     outBiasPercent, sides);
             }
         }
-        /*
-        for (int i = 0; i < mapDimensions; i++)
-        {
-            for (int j = 0; j < mapDimensions; j++)
-            {
-                DrawCell(cells[i,j], nodeDimensions, j * nodeDimensions, ((mapDimensions - 1 - i) * nodeDimensions));
-            }
-        }
-        */
-
+        
+        // Put it all into one big grid
         CellularAutomataInternal.CellState[,] bigGrid = CoalesceCellState(cells, mapDimensions, nodeDimensions);
+        
+        // Apply the rule on the whole grid to smooth it out
+        _nodeGenerator.ApplyRule(ref bigGrid, mapDimensions * nodeDimensions);
+        
+        // Draw the big grid
         DrawBigGrid(bigGrid, mapDimensions * nodeDimensions);
     }
 
@@ -119,7 +120,7 @@ public class GenerateLevel : MonoBehaviour
         {
             for (int j = 0; j < mapDimensions; j++)
             {
-                CellularAutomataInternal.CellState[,] current = cellStates[i, j];
+                CellularAutomataInternal.CellState[,]current = cellStates[i, j];
                 int xStart = j * nodeDimensions;
                 int yStart = ((mapDimensions - 1 - i) * nodeDimensions);
              
@@ -127,7 +128,9 @@ public class GenerateLevel : MonoBehaviour
                 {
                     for (int l = 0; l < nodeDimensions; l++)
                     {
-                        cells[k + xStart, l + yStart] = current[k, l];
+                        cells[k + xStart, l + yStart].traversable = current[k, l].traversable;
+                        cells[k + xStart, l + yStart].xIdx = k + xStart;
+                        cells[k + xStart, l + yStart].yIdx = l + yStart;
                     }
                     
                 }
