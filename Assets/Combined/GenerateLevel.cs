@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
@@ -14,9 +15,9 @@ public class GenerateLevel : MonoBehaviour
         _path = new SpelunkyPathInternal();
         int mapDimensions = 4;
         int nodeDimensions = 100;
-        float position = (mapDimensions * nodeDimensions) / 2;
-        Camera.main.transform.position = new Vector3(position, position, -10);
-        Camera.main.orthographicSize = 200;
+        //float position = (mapDimensions * nodeDimensions) / 2;
+        //Camera.main.transform.position = new Vector3(position, position, -10);
+        //Camera.main.orthographicSize = 200;
         CreateMap(mapDimensions,nodeDimensions, 7);
     }
 
@@ -153,6 +154,10 @@ public class GenerateLevel : MonoBehaviour
 
                 current.transform.position = new Vector3(i,  j, 0);
                 spr.color = cells[i, j].traversable ? Color.white : Color.black;
+                if (!cells[i, j].traversable)
+                {
+                    current.AddComponent<BoxCollider2D>();
+                }
             }
         }
     }
@@ -180,9 +185,9 @@ public class GenerateLevel : MonoBehaviour
         {
             for (int j = 0; j < dimensions; j++)
             {
-                GameObject current = Instantiate(tile);
+                GameObject current = Instantiate(tile) as GameObject;
                 var spr = current.GetComponent<SpriteRenderer>();
-
+                
                 current.transform.position = new Vector3(i + xStart,  yStart + j, 0);
                 spr.color = map[i, j].traversable ? Color.white : Color.black;
             }
