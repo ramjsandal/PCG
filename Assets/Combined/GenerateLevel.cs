@@ -21,7 +21,7 @@ public class GenerateLevel : MonoBehaviour
         float position = (mapDimensions * nodeDimensions) / 2;
         Camera.main.transform.position = new Vector3(position, position, -10);
         Camera.main.orthographicSize = 200;
-        CreateMap(mapDimensions,nodeDimensions, 7);
+        CreateMap(mapDimensions,nodeDimensions, 7, 3);
     }
 
     // Update is called once per frame
@@ -86,7 +86,7 @@ public class GenerateLevel : MonoBehaviour
 
           return sides;
     }
-    void CreateMap(int mapDimensions, int nodeDimensions, int generations = 3, int inBiasPercent = 56, int outBiasPercent = 44, int finalRule = 3)
+    void CreateMap(int mapDimensions, int nodeDimensions, int generations = 3, int finalRule = 3, int inBiasPercent = 56, int outBiasPercent = 44)
     {
         // Initialize grid to empty
         CellularAutomataInternal.CellState[,][,] cells = new CellularAutomataInternal.CellState[nodeDimensions,nodeDimensions][,];

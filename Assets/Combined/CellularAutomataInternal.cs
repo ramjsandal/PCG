@@ -13,12 +13,14 @@ public class CellularAutomataInternal
         public int xIdx;
         public int yIdx;
         public bool traversable;
+        public bool enemy;
 
         public CellState(int x, int y, bool trav)
         {
             xIdx = x;
             yIdx = y;
             traversable = trav;
+            enemy = false;
         }
     }
 
@@ -314,6 +316,11 @@ public class CellularAutomataInternal
                 yStart++;
             }
         }
+    }
+
+    public void AddEnemies()
+    {
+        
     }
 
 }
