@@ -15,6 +15,7 @@ public class CellularAutomataInternal
         public int yIdx;
         public bool traversable;
         public int enemy;
+        public bool spawnEnemy;
 
         public CellState(int x, int y, bool trav)
         {
@@ -22,6 +23,7 @@ public class CellularAutomataInternal
             yIdx = y;
             traversable = trav;
             enemy = 0;
+            spawnEnemy = false;
         }
     }
 
@@ -348,6 +350,13 @@ public class CellularAutomataInternal
                 if (!map[i,j].traversable || !map[i, j + 1].traversable || map[i, j - 1].traversable)
                 {
                     map[i,j].enemy = 0;
+                    continue;
+                }
+                
+                // if left or right cells have perfect enemy locations, this cant be an enemy
+                if (map[i - 1, j].enemy == 7 || map[i + 1, j].enemy == 7)
+                {
+                    map[i, j].enemy = 0;
                     continue;
                 }
 

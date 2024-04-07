@@ -103,7 +103,8 @@ public class GenerateLevel : MonoBehaviour
         }
         
         _nodeGenerator.ApplyEnemyRule(ref bigGrid, mapDimensions * nodeDimensions);
-        
+        FinalizeEnemies(bigGrid, mapDimensions * nodeDimensions);
+
         // Draw the big grid
         DrawBigGrid(bigGrid, mapDimensions * nodeDimensions, textured);
     }
@@ -135,6 +136,35 @@ public class GenerateLevel : MonoBehaviour
         }
         return cells;
     }
+    
+    CellularAutomataInternal.CellState[,][,] SplitCellState(CellularAutomataInternal.CellState[,] cellStates, int mapDimensions, int nodeDimensions)
+    {
+        CellularAutomataInternal.CellState[,][,] cells = new CellularAutomataInternal.CellState[nodeDimensions,nodeDimensions][,];
+
+        for (int i = 0; i < mapDimensions; i++)
+        {
+            for (int j = 0; j < mapDimensions; j++)
+            {
+                CellularAutomataInternal.CellState[,] current = new CellularAutomataInternal.CellState[nodeDimensions,nodeDimensions];
+                int xStart = j * nodeDimensions;
+                int yStart = ((mapDimensions - 1 - i) * nodeDimensions);
+             
+                for (int k = 0; k < nodeDimensions; k++)
+                {
+                    for (int l = 0; l < nodeDimensions; l++)
+                    {
+                        current[k, l].traversable = current[k, l].traversable;
+                        current[k, l].xIdx = k - xStart;
+                        current[k, l].yIdx = l - yStart;
+                        current[k, l].enemy = current[k, l].enemy;
+                    }
+                }
+
+                cells[i, j] = current;
+            }
+        }
+        return cells;
+    }
 
     void DrawBigGrid(CellularAutomataInternal.CellState[,] cells, int dimensions, bool textured)
     {
@@ -153,7 +183,7 @@ public class GenerateLevel : MonoBehaviour
                 else
                 {
                     spr.color = cells[i, j].traversable ? Color.white : Color.black;
-                    spr.color = cells[i, j].enemy >= 7 ? Color.red : spr.color;
+                    spr.color = cells[i, j].spawnEnemy ? Color.red : spr.color;
                 }
                 
                 if (!cells[i, j].traversable)
@@ -163,7 +193,26 @@ public class GenerateLevel : MonoBehaviour
             }
         }
     }
+    
+    void FinalizeEnemies(CellularAutomataInternal.CellState[,] cells, int dimensions)
+    {
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int j = 0; j < dimensions; j++)
+            {
+                // if we dont have a perfect enemy spawn
+                // move on
+                if (cells[i, j].enemy < 7)
+                {
+                    cells[i, j].spawnEnemy = false;
+                    continue;
+                }
 
+                cells[i, j].spawnEnemy = Random.Range(0, dimensions) > j && Random.Range(0, 2) == 1;
+            }
+        }
+    }
+    
     Bias numberToBias(int num)
     {
         switch (num)
