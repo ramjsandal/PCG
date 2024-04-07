@@ -7,6 +7,9 @@ using UnityEngine;
 public class GenerateLevel : MonoBehaviour
 {
     [SerializeField] private GameObject tile;
+    [SerializeField] private Sprite traversableSprite;
+    [SerializeField] private Sprite untraversableSprite;
+    [SerializeField] private bool textured;
     private SpelunkyPathInternal _path;
     private CellularAutomataInternal _nodeGenerator;
     void Start()
@@ -15,9 +18,9 @@ public class GenerateLevel : MonoBehaviour
         _path = new SpelunkyPathInternal();
         int mapDimensions = 4;
         int nodeDimensions = 100;
-        //float position = (mapDimensions * nodeDimensions) / 2;
-        //Camera.main.transform.position = new Vector3(position, position, -10);
-        //Camera.main.orthographicSize = 200;
+        float position = (mapDimensions * nodeDimensions) / 2;
+        Camera.main.transform.position = new Vector3(position, position, -10);
+        Camera.main.orthographicSize = 200;
         CreateMap(mapDimensions,nodeDimensions, 7);
     }
 
@@ -113,7 +116,7 @@ public class GenerateLevel : MonoBehaviour
         }
         
         // Draw the big grid
-        DrawBigGrid(bigGrid, mapDimensions * nodeDimensions);
+        DrawBigGrid(bigGrid, mapDimensions * nodeDimensions, textured);
     }
 
     CellularAutomataInternal.CellState[,] CoalesceCellState(CellularAutomataInternal.CellState[,][,] cellStates, int mapDimensions, int nodeDimensions)
@@ -143,7 +146,7 @@ public class GenerateLevel : MonoBehaviour
         return cells;
     }
 
-    void DrawBigGrid(CellularAutomataInternal.CellState[,] cells, int dimensions)
+    void DrawBigGrid(CellularAutomataInternal.CellState[,] cells, int dimensions, bool textured)
     {
         for (int i = 0; i < dimensions; i++)
         {
@@ -153,7 +156,15 @@ public class GenerateLevel : MonoBehaviour
                 var spr = current.GetComponent<SpriteRenderer>();
 
                 current.transform.position = new Vector3(i,  j, 0);
-                spr.color = cells[i, j].traversable ? Color.white : Color.black;
+                if (textured)
+                {
+                    spr.sprite = cells[i, j].traversable ? traversableSprite : untraversableSprite;
+                }
+                else
+                {
+                    spr.color = cells[i, j].traversable ? Color.white : Color.black;
+                }
+                
                 if (!cells[i, j].traversable)
                 {
                     current.AddComponent<BoxCollider2D>();

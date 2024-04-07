@@ -153,6 +153,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tile: {fileID: 7075652373530807814, guid: c31289bd629feb04d9f385bcac52c906, type: 3}
+  traversableSprite: {fileID: 21300000, guid: 28ee8d29cdd92574fbd196655d50d58e, type: 3}
+  untraversableSprite: {fileID: 21300000, guid: 65939f5f9e9163f4e97e9044e42a7352, type: 3}
+  textured: 0
 --- !u!4 &226752041
 Transform:
   m_ObjectHideFlags: 0
@@ -187,7 +190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &761098033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,7 +204,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  gravity: 2
+  jumpForce: 10
 --- !u!70 &761098035
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -281,10 +284,9 @@ Transform:
   m_LocalPosition: {x: 95.81734, y: 363.27466, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1201059151}
+  m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &761098038
 Rigidbody2D:
@@ -384,10 +386,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1201059148}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 95.81734, y: 363.27466, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 761098037}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
