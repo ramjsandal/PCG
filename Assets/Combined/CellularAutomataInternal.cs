@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,14 +14,14 @@ public class CellularAutomataInternal
         public int xIdx;
         public int yIdx;
         public bool traversable;
-        public bool enemy;
+        public int enemy;
 
         public CellState(int x, int y, bool trav)
         {
             xIdx = x;
             yIdx = y;
             traversable = trav;
-            enemy = false;
+            enemy = 0;
         }
     }
 
@@ -318,9 +319,70 @@ public class CellularAutomataInternal
         }
     }
 
-    public void AddEnemies()
+    public void ApplyEnemyRule(ref CellState[,] map, int dimensions)
     {
-        
+        // Rule for this one is going to be as follows
+        // Were going to rate different positions based on how much we 'like'
+        // putting an enemy there
+        // Best positions (current cell is middle):
+        // EMPTY EMPTY EMPTY     EMPTY EMPTY EMPTY     EMPTY EMPTY EMPTY
+        // EMPTY EMPTY EMPTY  >  EMPTY EMPTY EMPTY  =  EMPTY EMPTY EMPTY
+        // ROCK  ROCK  ROCK      EMPTY ROCK ROCK       ROCK  ROCK  EMPTY
+        // How we assign points:
+        // 1 if e    need e    1 if e
+        // 1 if e    need e    1 if e
+        // 1 if r    need r    1 if r
+        // if all 3 needs are there we init to 1
+        // so best cells for enemies = 7, cant contain enemy = 0;
+        // 1 is worst cell that can have an enemy
+
+        // we dont iterate over the edges 
+        // because we never want enemies there
+        // and now we dont have to do bounds checking
+        for (int i = 1; i < dimensions - 1; i++)
+        {
+            for (int j = 1; j < dimensions - 1; j++)
+            {
+                // we need middle top and middle middle to be
+                // empty, and middle bottom to be rock
+                if (!map[i,j].traversable || !map[i, j + 1].traversable || map[i, j - 1].traversable)
+                {
+                    map[i,j].enemy = 0;
+                    continue;
+                }
+
+                map[i,j].enemy += 1;
+
+                for (int k = -1; k <= 1; k++)
+                {
+                    for (int l = -1; l <= 1; l++)
+                    {
+                        // these are the necessary cells
+                        if (k == 0)
+                        {
+                            continue;
+                        }
+
+                        // if were on the bottom row and were a rock
+                        // we like this cell more
+                        if (l == -1 && !map[i + k, j + l].traversable)
+                        {
+                            map[i,j].enemy += 1;
+                            continue;
+                        } 
+                        
+                        // if were not on the bottom row and were not
+                        // a rock, we like this cell more
+                        if (map[i + k, j + l].traversable)
+                        {
+                            map[i,j].enemy += 1;
+                        }
+                    }
+                }
+                
+            }
+        }
+
     }
 
 }

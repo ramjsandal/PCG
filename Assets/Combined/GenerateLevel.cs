@@ -24,19 +24,6 @@ public class GenerateLevel : MonoBehaviour
         CreateMap(mapDimensions,nodeDimensions, 7, 3);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    private void GenerateAndDrawCell(int dimensions, int generations, Bias bias, int inBiasPercent, int outBiasPercent, int xStart, int yStart)
-    {
-        CellularAutomataInternal.CellState[,] nodeOne = _nodeGenerator.GenerateArea(dimensions, generations, bias, inBiasPercent, outBiasPercent);
-        DrawCell(nodeOne, dimensions, xStart, yStart);
- 
-    }
-
     CellularAutomataInternal.CellState[,] GenerateCell(int dimensions, int generations, Bias b, int inBiasPercent, int outBiasPercent, (bool[], CellularAutomataInternal.Side)[] sides)
     {
         return _nodeGenerator.GenerateArea(dimensions, generations, b, inBiasPercent, outBiasPercent, sides);
@@ -115,6 +102,8 @@ public class GenerateLevel : MonoBehaviour
             _nodeGenerator.ApplyRule(ref bigGrid, mapDimensions * nodeDimensions);
         }
         
+        _nodeGenerator.ApplyEnemyRule(ref bigGrid, mapDimensions * nodeDimensions);
+        
         // Draw the big grid
         DrawBigGrid(bigGrid, mapDimensions * nodeDimensions, textured);
     }
@@ -138,6 +127,7 @@ public class GenerateLevel : MonoBehaviour
                         cells[k + xStart, l + yStart].traversable = current[k, l].traversable;
                         cells[k + xStart, l + yStart].xIdx = k + xStart;
                         cells[k + xStart, l + yStart].yIdx = l + yStart;
+                        cells[k + xStart, l + yStart].enemy = current[k, l].enemy;
                     }
                     
                 }
@@ -163,6 +153,7 @@ public class GenerateLevel : MonoBehaviour
                 else
                 {
                     spr.color = cells[i, j].traversable ? Color.white : Color.black;
+                    spr.color = cells[i, j].enemy >= 7 ? Color.red : spr.color;
                 }
                 
                 if (!cells[i, j].traversable)
@@ -189,20 +180,5 @@ public class GenerateLevel : MonoBehaviour
                 throw new InvalidEnumArgumentException();
         }
     }
-    
-    public void DrawCell(CellularAutomataInternal.CellState[,] map, int dimensions, int xStart, int yStart)
-    {
-        for (int i = 0; i < dimensions; i++)
-        {
-            for (int j = 0; j < dimensions; j++)
-            {
-                GameObject current = Instantiate(tile) as GameObject;
-                var spr = current.GetComponent<SpriteRenderer>();
-                
-                current.transform.position = new Vector3(i + xStart,  yStart + j, 0);
-                spr.color = map[i, j].traversable ? Color.white : Color.black;
-            }
-        }
-    }
-    
+   
 }
