@@ -103,7 +103,10 @@ public class GenerateLevel : MonoBehaviour
         }
         
         _nodeGenerator.ApplyEnemyRule(ref bigGrid, mapDimensions * nodeDimensions);
-        FinalizeEnemies(bigGrid, mapDimensions * nodeDimensions);
+        FinalizeEnemies(ref bigGrid, mapDimensions * nodeDimensions);
+        
+        _nodeGenerator.ApplyChestRule(ref bigGrid, mapDimensions * nodeDimensions);
+        FinalizeChests(ref bigGrid, mapDimensions * nodeDimensions);
 
         // Draw the big grid
         DrawBigGrid(bigGrid, mapDimensions * nodeDimensions, textured);
@@ -129,6 +132,7 @@ public class GenerateLevel : MonoBehaviour
                         cells[k + xStart, l + yStart].xIdx = k + xStart;
                         cells[k + xStart, l + yStart].yIdx = l + yStart;
                         cells[k + xStart, l + yStart].enemy = current[k, l].enemy;
+                        cells[k + xStart, l + yStart].chest = current[k, l].chest;
                     }
                     
                 }
@@ -157,6 +161,7 @@ public class GenerateLevel : MonoBehaviour
                         current[k, l].xIdx = k - xStart;
                         current[k, l].yIdx = l - yStart;
                         current[k, l].enemy = current[k, l].enemy;
+                        current[k, l].chest= current[k, l].chest;
                     }
                 }
 
@@ -184,6 +189,7 @@ public class GenerateLevel : MonoBehaviour
                 {
                     spr.color = cells[i, j].traversable ? Color.white : Color.black;
                     spr.color = cells[i, j].spawnEnemy ? Color.red : spr.color;
+                    spr.color = cells[i, j].spawnChest ? Color.green: spr.color;
                 }
                 
                 if (!cells[i, j].traversable)
@@ -194,7 +200,7 @@ public class GenerateLevel : MonoBehaviour
         }
     }
     
-    void FinalizeEnemies(CellularAutomataInternal.CellState[,] cells, int dimensions)
+    void FinalizeEnemies(ref CellularAutomataInternal.CellState[,] cells, int dimensions)
     {
         for (int i = 0; i < dimensions; i++)
         {
@@ -212,6 +218,26 @@ public class GenerateLevel : MonoBehaviour
             }
         }
     }
+    
+    void FinalizeChests(ref CellularAutomataInternal.CellState[,] cells, int dimensions)
+    {
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int j = 0; j < dimensions; j++)
+            {
+                // if we dont have a perfect chest spawn
+                // move on
+                if (cells[i, j].chest < 5)
+                {
+                    cells[i, j].spawnChest = false;
+                    continue;
+                }
+
+                cells[i, j].spawnChest = Random.Range(0, dimensions) > j && Random.Range(0, 2) == 1;
+            }
+        }
+    }
+ 
     
     Bias numberToBias(int num)
     {

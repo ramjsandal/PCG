@@ -16,6 +16,8 @@ public class CellularAutomataInternal
         public bool traversable;
         public int enemy;
         public bool spawnEnemy;
+        public int chest;
+        public bool spawnChest;
 
         public CellState(int x, int y, bool trav)
         {
@@ -24,6 +26,8 @@ public class CellularAutomataInternal
             traversable = trav;
             enemy = 0;
             spawnEnemy = false;
+            chest = 0;
+            spawnChest = false;
         }
     }
 
@@ -394,4 +398,85 @@ public class CellularAutomataInternal
 
     }
 
+    public void ApplyChestRule(ref CellState[,] map, int dimensions)
+    {
+        // Rule for this one is going to be as follows
+        // Were going to rate different positions based on how much we 'like'
+        // putting a chest there
+        // Best positions (current cell is middle):
+        // ROCK  EMPTY EMPTY     EMPTY EMPTY ROCK      EMPTY EMPTY EMPTY       ROCK  EMPTY  ROCK
+        // ROCK  EMPTY EMPTY  =  EMPTY EMPTY ROCK   >  ROCK  EMPTY EMPTY   >   ROCK  EMPTY  ROCK
+        // ROCK  ROCK  ROCK      ROCK  ROCK  ROCK      ROCK  ROCK  EMPTY       ROCK  ROCK   ROCK
+        // How we assign points:
+        // 1 if e and not r on other side top     need e    1 if e and not r on other side top 
+        // 1 if e and not r on other side top     need e    1 if e and not r on other side top 
+        // 1 if r                                 need r    1 if r
+        // if all 3 needs are there we init to 1
+        // so best cells for chest = 5, cant contain chest = 0;
+        // 1 is worst cell that can have a chest 
+
+        // we dont iterate over the edges 
+        // because we never want chests there
+        // and now we dont have to do bounds checking
+        for (int i = 1; i < dimensions - 1; i++)
+        {
+            for (int j = 1; j < dimensions - 1; j++)
+            {
+                // we need middle top and middle middle to be
+                // empty, and middle bottom to be rock
+                if (!map[i,j].traversable || !map[i, j + 1].traversable || map[i, j - 1].traversable)
+                {
+                    map[i,j].chest = 0;
+                    continue;
+                }
+                
+                // if left or right cells have perfect chest locations, this cant be a chest 
+                if (map[i - 1, j].chest == 7 || map[i + 1, j].chest == 7)
+                {
+                    map[i, j].chest = 0;
+                    continue;
+                }
+
+                map[i,j].chest += 1;
+
+                for (int k = -1; k <= 1; k++)
+                {
+                    for (int l = -1; l <= 1; l++)
+                    {
+                        // these are the necessary cells
+                        if (k == 0)
+                        {
+                            continue;
+                        }
+
+                        // if were on the bottom row and were a rock
+                        // we like this cell more
+                        if (l == -1)
+                        {
+                            if (k == 1 && map[i + k, j + l].traversable)
+                            {
+                                map[i,j].chest += 1;
+                            } else if (!map[i + k, j + l].traversable)
+                            {
+                                map[i,j].chest += 1;
+                            }
+                            continue;
+                        } 
+                        
+                        // through trial and error realized that
+                        // in our remaining 4 cells, we will never
+                        // have one with more than one rock
+                        if (k == -1 && !map[i + k, j + l].traversable)
+                        {
+                            map[i,j].chest += 1;
+                            continue;
+                        }
+                        
+                    }
+                }
+                
+            }
+        }
+
+    }
 }
