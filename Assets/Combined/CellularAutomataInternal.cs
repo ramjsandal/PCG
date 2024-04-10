@@ -1,10 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Unity.VisualScripting;
-using UnityEditor.SceneTemplate;
-using UnityEngine;
 
 public class CellularAutomataInternal
 {
@@ -378,10 +373,13 @@ public class CellularAutomataInternal
 
                         // if were on the bottom row and were a rock
                         // we like this cell more
-                        if (l == -1 && !map[i + k, j + l].traversable)
+                        if (l == -1)
                         {
-                            map[i,j].enemy += 1;
-                            continue;
+                            if (!map[i + k, j + l].traversable)
+                            {
+                                map[i,j].enemy += 1;
+                            } 
+                            continue;    
                         } 
                         
                         // if were not on the bottom row and were not
