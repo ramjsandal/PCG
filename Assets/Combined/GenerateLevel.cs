@@ -10,6 +10,7 @@ public class GenerateLevel : MonoBehaviour
     [SerializeField] private Sprite traversableSprite;
     [SerializeField] private Sprite untraversableSprite;
     [SerializeField] private bool textured;
+    [SerializeField] private bool player;
     private SpelunkyPathInternal _path;
     private CellularAutomataInternal _nodeGenerator;
     void Start()
@@ -18,9 +19,12 @@ public class GenerateLevel : MonoBehaviour
         _path = new SpelunkyPathInternal();
         int mapDimensions = 4;
         int nodeDimensions = 100;
-        float position = (mapDimensions * nodeDimensions) / 2;
-        Camera.main.transform.position = new Vector3(position, position, -10);
-        Camera.main.orthographicSize = 200;
+        if (!player)
+        {
+          float position = (mapDimensions * nodeDimensions) / 2;
+          Camera.main.transform.position = new Vector3(position, position, -10);
+          Camera.main.orthographicSize = position;    
+        }
         CreateMap(mapDimensions,nodeDimensions, 7, 3);
     }
 
