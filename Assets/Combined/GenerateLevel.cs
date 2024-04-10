@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Security.Cryptography;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class GenerateLevel : MonoBehaviour
@@ -13,6 +15,8 @@ public class GenerateLevel : MonoBehaviour
     [SerializeField] private Sprite untraversableSprite;
     [SerializeField] private GameObject enemy;
     [SerializeField] private GameObject chest;
+    [SerializeField] private GameObject playerObject;
+    [SerializeField] private GameObject loadingMenu;
     [SerializeField] private bool textured;
     [SerializeField] private bool player;
     private SpelunkyPathInternal _path;
@@ -30,6 +34,15 @@ public class GenerateLevel : MonoBehaviour
           Camera.main.orthographicSize = position;    
         }
         CreateMap(mapDimensions,nodeDimensions, 7, 3);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            loadingMenu.SetActive(true);
+            SceneManager.LoadScene(0);
+        }
     }
 
     CellularAutomataInternal.CellState[,] GenerateCell(int dimensions, int generations, Bias b, int inBiasPercent, int outBiasPercent, (bool[], CellularAutomataInternal.Side)[] sides)
@@ -270,6 +283,35 @@ public class GenerateLevel : MonoBehaviour
                 }
             }
         }
+    }
+
+    void PickPlayerSpawnLocation(CellularAutomataInternal.CellState[,] map, int[,] layout, int mapDimensions, int nodeDimensions)
+    {
+        // get starting cell
+        int j = 0;
+        for (j = 0; j < mapDimensions; j++)
+        {
+            if (layout[0, j] == 3)
+            {
+                // we found it
+                break;
+            }
+
+            if (j == mapDimensions - 1)
+            {
+                throw new Exception("couldnt find start cell");
+            }
+        }
+        
+        // first cell to look at
+        (int,int) coords = ((int) ((j + .5) * nodeDimensions), nodeDimensions * mapDimensions);
+        while (!map[coords.Item1, coords.Item2].traversable)
+        {
+            coords.Item2--;
+        }
+
+        GameObject player = Instantiate(playerObject);
+        player.transform.position = new Vector3(coords.Item1, coords.Item2, 0);
     }
  
     
