@@ -239,11 +239,11 @@ MonoBehaviour:
   tile: {fileID: 1401198040256589742, guid: cafddb22837f0cb43baa39e0132878f5, type: 3}
   dimensions: 100
   cam: {fileID: 519420031}
-  bias: 3
-  inBiasPercent: 55
-  outBiasPercent: 45
-  rowPercent: 0.66
-  side: 0
+  bias: 0
+  inBiasPercent: 50
+  outBiasPercent: 50
+  rowPercent: 0
+  side: 4
 --- !u!4 &1434650025
 Transform:
   m_ObjectHideFlags: 0

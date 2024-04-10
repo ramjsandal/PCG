@@ -53,7 +53,7 @@ public class CreateSpelunkyPath : MonoBehaviour
             for (int j = 0; j < dimensions; j++)
             {
                tiles[i, j] = Instantiate(tile);
-               tiles[i, j].transform.position = new Vector3(j, i, 0);
+               tiles[i, j].transform.position = new Vector3(j, dimensions - i, 0);
                switch (layout[i,j]) 
                {
                   case 0:
