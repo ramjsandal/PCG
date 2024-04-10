@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Numerics;
+using Unity.VisualScripting;
 using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
 
@@ -46,12 +48,28 @@ public class PlayerScript : MonoBehaviour
         // Cast a ray straight down.
         RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, 1, LayerMask.GetMask("Floor"));
 
-        // If it hits something...
+        // If it missing below check left and right
         if (hit.collider != null)
         {
-            // Apply the force to the rigidbody.
             rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
         }
+        else
+        {
+          RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, Vector2.left, 1, LayerMask.GetMask("Floor"));
+          if (hitLeft.collider != null)
+          {
+             rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);      
+          }
+          else
+          { 
+              RaycastHit2D hitRight = Physics2D.Raycast(transform.position, Vector2.right, 1, LayerMask.GetMask("Floor"));
+              if (hitRight.collider != null)
+              {
+                rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);      
+              }   
+          }
+        }
+        
     }
 
     private void OnCollisionEnter(Collision collision)

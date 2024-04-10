@@ -2,13 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Security.Cryptography;
+using Unity.Mathematics;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GenerateLevel : MonoBehaviour
 {
     [SerializeField] private GameObject tile;
     [SerializeField] private Sprite traversableSprite;
     [SerializeField] private Sprite untraversableSprite;
+    [SerializeField] private GameObject enemy;
+    [SerializeField] private GameObject chest;
     [SerializeField] private bool textured;
     [SerializeField] private bool player;
     private SpelunkyPathInternal _path;
@@ -106,6 +110,8 @@ public class GenerateLevel : MonoBehaviour
             _nodeGenerator.ApplyRule(ref bigGrid, mapDimensions * nodeDimensions);
         }
         
+        MakeBorder(ref bigGrid, mapDimensions * nodeDimensions);
+        
         _nodeGenerator.ApplyEnemyRule(ref bigGrid, mapDimensions * nodeDimensions);
         FinalizeEnemies(ref bigGrid, mapDimensions * nodeDimensions);
         
@@ -188,6 +194,16 @@ public class GenerateLevel : MonoBehaviour
                 if (textured)
                 {
                     spr.sprite = cells[i, j].traversable ? traversableSprite : untraversableSprite;
+                    if (cells[i, j].spawnEnemy)
+                    {
+                        Vector3 position = new Vector3(cells[i, j].xIdx, cells[i, j].yIdx, 0);
+                        Instantiate(enemy, position, quaternion.identity);
+                    }
+                    if (cells[i, j].spawnChest)
+                    {
+                        Vector3 position = new Vector3(cells[i, j].xIdx, cells[i, j].yIdx, 0);
+                        Instantiate(chest, position, quaternion.identity);
+                    }
                 }
                 else
                 {
@@ -238,6 +254,20 @@ public class GenerateLevel : MonoBehaviour
                 }
 
                 cells[i, j].spawnChest = Random.Range(0, dimensions) > j && Random.Range(0, 2) == 1;
+            }
+        }
+    }
+
+    void MakeBorder(ref CellularAutomataInternal.CellState[,] cells, int dimensions)
+    {
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int j = 0; j < dimensions; j++)
+            {
+                if (i == 0 || j == 0 || i == dimensions - 1 || j == dimensions - 1)
+                {
+                    cells[i, j].traversable = false;
+                }
             }
         }
     }
